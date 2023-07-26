@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+		"Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+		sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	/* background-color: #87ceeb; */
+}
+
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+		monospace;
+}
+
+.main-container {
+	@apply h-screen w-screen flex flex-col justify-center gap-4 items-center;
+	background-image: url("./assets/bg-main.jpg");
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+
+.input-form {
+	@apply bg-transparent p-4 border border-cyan-500 rounded-lg text-white w-full text-base focus:outline-none;
+}
+
+.button-form {
+	@apply font-bold bg-transparent border border-cyan-500 rounded-lg text-base uppercase hover:bg-violet-900 p-4 text-white;
+}
+
+.chat-container {
+	@apply bg-indigo-800;
+	background-color: transparent;
+	height: 85vh;
+	width: 85vw;
+	display: grid;
+	grid-template-columns: 25% 75%;
+	@media screen and (min-width: 768px) and (max-width: 1024px) {
+		grid-template-columns: 35% 65%;
+	}
+}
+
+.grid-container {
+	border: 1px solid red;
+}
