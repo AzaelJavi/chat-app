@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import InputForm from "./widgets/InputForm";
-import Button from "./widgets/Button";
 import Joi from "joi-browser";
 
 function UseForm({ schemaJoi, doSubmit, data, setData }) {
@@ -54,6 +53,7 @@ function UseForm({ schemaJoi, doSubmit, data, setData }) {
 				error={error[name]}
 				placeholder={placeholder}
 				onChange={handleChange}
+				className={" text-white"}
 			/>
 		);
 	};

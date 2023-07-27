@@ -25,16 +25,16 @@ code {
 }
 
 .input-form {
-	@apply bg-transparent p-4 border border-cyan-500 rounded-lg text-white w-full text-base focus:outline-none;
+	@apply bg-transparent p-4 border border-cyan-500 rounded-lg w-full h-3/5 text-base focus:outline-none;
 }
 
 .button-form {
 	@apply font-bold bg-transparent border border-cyan-500 rounded-lg text-base uppercase hover:bg-violet-900 p-4 text-white;
 }
 
+/* Home Chat */
 .chat-container {
-	@apply bg-indigo-800;
-	background-color: transparent;
+	background-color: #fffff0;
 	height: 85vh;
 	width: 85vw;
 	display: grid;
@@ -45,5 +45,96 @@ code {
 }
 
 .grid-container {
+	border: 1px solid #8d949e;
+}
+
+div {
 	border: 1px solid red;
+}
+/* Contacts */
+/* selected a8395c ffe0e8 */
+.contacts-container {
+	display: grid;
+	grid-template-rows: 10% 80% 10%;
+	overflow: hidden;
+}
+
+.contacts {
+	@apply flex flex-col items-center overflow-auto gap-4;
+}
+
+.contact__user {
+	@apply flex items-center cursor-pointer p-2 rounded-md my-1 ml-1 transition duration-300 ease-in-out;
+	min-height: 5rem;
+	width: 95%;
+}
+.selected__contact {
+	background-color: #ffe0e8;
+}
+
+.current-user {
+	@apply flex justify-between gap-8;
+}
+/* Messages Container */
+
+.message-container {
+	@apply overflow-hidden;
+	display: grid;
+	grid-template-rows: 10% 80% 10%;
+	gap: 0.1rem;
+	@media screen and (min-width: 768px) and (max-width: 1024px) {
+		grid-template-rows: 15% 70% 15%;
+	}
+}
+
+.chat__header {
+	@apply flex justify-between items-center py-8;
+}
+
+/* Chat Messages */
+.chat-messages {
+	@apply px-4 py-8 flex flex-col gap-4 overflow-auto;
+	::-webkit-scrollbar {
+		width: 0.2rem;
+	}
+	::-ms-thumb {
+		background-color: #ffffff39;
+		width: 0.1rem;
+		border-radius: 1rem;
+	}
+}
+
+.message {
+	display: flex;
+	align-items: center;
+}
+
+.message__content {
+	max-width: 40%;
+	overflow-wrap: break-word;
+	padding: 1rem;
+	font-size: 1.1rem;
+	border-radius: 1rem;
+	background-color: #fffff0;
+}
+
+.sender__position {
+	justify-content: flex-end;
+}
+
+.receiver__position {
+	justify-content: flex-start;
+}
+.send-message {
+	background-color: #ffe0e8;
+	color: black;
+}
+
+.receive-message {
+	background-color: #e4e6eb;
+	color: black;
+}
+/* Chat Input */
+.input-container {
+	@apply w-full rounded-3xl flex items-center gap-4 focus:outline-none;
 }

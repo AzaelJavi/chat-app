@@ -1,13 +1,13 @@
 import React from "react";
 
-function InputForm({ name, placeholder, error, ...rest }) {
+function InputForm({ name, placeholder, error, className, ...rest }) {
 	return (
 		<>
 			<input
 				name={name}
 				id={name}
 				placeholder={placeholder}
-				className="input-form"
+				className={`input-form ${className}`}
 				{...rest}
 			/>
 			{error && (
