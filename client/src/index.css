@@ -44,15 +44,14 @@ code {
 	}
 }
 
-.grid-container {
+.grid-item {
 	border: 1px solid #8d949e;
 }
 
-div {
+/* div {
 	border: 1px solid red;
-}
+} */
 /* Contacts */
-/* selected a8395c ffe0e8 */
 .contacts-container {
 	display: grid;
 	grid-template-rows: 10% 80% 10%;
@@ -73,7 +72,14 @@ div {
 }
 
 .current-user {
-	@apply flex justify-between gap-8;
+	@apply flex justify-between items-center gap-8;
+}
+
+.username {
+	background-color: transparent;
+}
+.username:hover {
+	background-color: #ffe0e8;
 }
 /* Messages Container */
 
@@ -81,7 +87,7 @@ div {
 	@apply overflow-hidden;
 	display: grid;
 	grid-template-rows: 10% 80% 10%;
-	gap: 0.1rem;
+
 	@media screen and (min-width: 768px) and (max-width: 1024px) {
 		grid-template-rows: 15% 70% 15%;
 	}
@@ -94,14 +100,14 @@ div {
 /* Chat Messages */
 .chat-messages {
 	@apply px-4 py-8 flex flex-col gap-4 overflow-auto;
-	::-webkit-scrollbar {
-		width: 0.2rem;
-	}
-	::-ms-thumb {
-		background-color: #ffffff39;
-		width: 0.1rem;
-		border-radius: 1rem;
-	}
+}
+.chat-messages::-webkit-scrollbar {
+	width: 0.2rem;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+	width: 1rem;
+	background-color: #580b34;
+	border-radius: 1rem;
 }
 
 .message {

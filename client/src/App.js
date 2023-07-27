@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import HomeChat from "./pages/HomeChat";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./utils/ProtectedRoute";
 
 function App(props) {
 	return (
@@ -11,9 +12,11 @@ function App(props) {
 			<Routes>
 				<Route path="/register" element={<Register />} />
 				<Route path="/login" element={<Login />} />
-				<Route path="/home" element={<HomeChat />} />
+				<Route element={<ProtectedRoute />}>
+					<Route path="/home" element={<HomeChat />} />
+					<Route path="/" element={<HomeChat />} />
+				</Route>
 				<Route path="/not-found" element={<NotFound />} />
-				<Route path="/" element={<HomeChat />} />
 				<Route path="*" element={<Navigate to="/not-found" />} />
 			</Routes>
 		</div>

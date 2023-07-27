@@ -6,6 +6,9 @@ import { Link } from "react-router-dom";
 import authService from "../services/authService";
 
 function Login(props) {
+	if (localStorage) {
+		authService.logout();
+	}
 	const [data, setData] = useState({
 		email: "",
 		password: "",
