@@ -12,7 +12,6 @@ function ChatInput({ onSendMessage }) {
 			setValue("");
 		}
 	};
-
 	return (
 		<>
 			<form className="input-container" onSubmit={(e) => doSubmit(e)}>

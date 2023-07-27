@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import useCurrentUser from "../customHooks/useCurrentUser";
 
 function ChatMessages({ messages }) {
@@ -9,12 +9,12 @@ function ChatMessages({ messages }) {
 			{messages &&
 				messages.map((message, index) => {
 					const messagePosition =
-						message.sender._id === user._id
+						message.sender?._id === user?._id
 							? "sender__position"
 							: "receiver__position";
 
 					const messageColor =
-						message.sender._id === user._id
+						message.sender?._id === user?._id
 							? "send-message"
 							: "receive-message";
 					return (
