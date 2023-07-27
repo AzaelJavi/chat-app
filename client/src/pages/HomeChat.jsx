@@ -6,6 +6,7 @@ import ChatContainer from "./../components/ChatContainer";
 import {
 	getConversation,
 	newConversation,
+	saveConversation,
 } from "../services/conversationService";
 import { io } from "socket.io-client";
 import config from "../services/config.json";
@@ -88,6 +89,40 @@ function HomeChat(props) {
 	// console.log("currentchat", currentChat);
 	// console.log("conversationId", getConversationId);
 
+	const handleMessage = async (message) => {
+		// !message parameter is just a string
+		socket.current.emit("send-msg", {
+			message: message,
+			receiver: currentChat?._id,
+		});
+
+		setCurrentConversation((prevMessages) => [
+			...prevMessages,
+			{
+				sender: {
+					// To ensure the correct sender
+					_id: user?._id,
+					username: user?.username,
+				},
+				content: message,
+			},
+		]);
+		await saveConversation(getConversationId, user, message);
+	};
+
+	useEffect(() => {
+		if (socket.current) {
+			socket.current.on("msg-receive", (messageContent) => {
+				setCurrentConversation((prevMessages) => [
+					...prevMessages,
+					{
+						content: messageContent,
+					},
+				]);
+			});
+		}
+	}, [user]);
+
 	const handleChatChange = (chat) => {
 		setCurrentChat(chat);
 	};
@@ -106,6 +141,7 @@ function HomeChat(props) {
 					setCurrentConversation={setCurrentConversation}
 					messages={currentConversation}
 					socket={socket}
+					onSendMessage={handleMessage}
 				/>
 			) : null}
 		</div>

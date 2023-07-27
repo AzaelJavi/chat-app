@@ -1,51 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
-import { saveConversation } from "../services/conversationService";
-import useCurrentUser from "../customHooks/useCurrentUser";
 
-function ChatContainer({
-	currentChat,
-	messages,
-	setCurrentConversation,
-	conversationId,
-	socket,
-}) {
-	const user = useCurrentUser();
-
-	const handleMessage = async (message) => {
-		// !message parameter is just a string
-		socket.current.emit("send-msg", {
-			message: message,
-			receiver: currentChat?._id,
-		});
-
-		setCurrentConversation((prevMessages) => [
-			...prevMessages,
-			{
-				sender: {
-					// To ensure the correct sender
-					_id: user?._id,
-					username: user?.username,
-				},
-				content: message,
-			},
-		]);
-		await saveConversation(conversationId, user, message);
-	};
-
-	useEffect(() => {
-		if (socket.current) {
-			socket.current.on("msg-receive", (messageContent) => {
-				setCurrentConversation((prevMessages) => [
-					...prevMessages,
-					{
-						content: messageContent,
-					},
-				]);
-			});
-		}
-	}, [user]);
+function ChatContainer({ currentChat, messages, onSendMessage }) {
 	return (
 		<div className="message-container">
 			<div className="chat__header grid-container">
@@ -59,7 +16,7 @@ function ChatContainer({
 				</div>
 			</div>
 			{<ChatMessages messages={messages} />}
-			<ChatInput onSendMessage={handleMessage} />
+			<ChatInput onSendMessage={onSendMessage} />
 		</div>
 	);
 }

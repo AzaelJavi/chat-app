@@ -1,8 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import useCurrentUser from "../customHooks/useCurrentUser";
 
 function ChatMessages({ messages }) {
 	const user = useCurrentUser();
+
+	const scroll = useRef();
+
+	useEffect(() => {
+		scroll?.current?.scrollIntoView({ behavior: "smooth" });
+	}, [messages]);
 
 	return (
 		<div className="chat-messages">
@@ -18,7 +24,7 @@ function ChatMessages({ messages }) {
 							? "send-message"
 							: "receive-message";
 					return (
-						<div key={index}>
+						<div ref={scroll} key={index}>
 							<div className={`message ${messagePosition}`}>
 								<div className={`message__content  ${messageColor}`}>
 									<p>{message.content}</p>
