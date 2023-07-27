@@ -12,8 +12,9 @@ function ChatContainer({
 	socket,
 }) {
 	const user = useCurrentUser();
+
 	const handleMessage = async (message) => {
-		//message parameter is just a string
+		// !message parameter is just a string
 		socket.current.emit("send-msg", {
 			message: message,
 			receiver: currentChat?._id,
@@ -21,7 +22,14 @@ function ChatContainer({
 
 		setCurrentConversation((prevMessages) => [
 			...prevMessages,
-			{ message: { content: message } },
+			{
+				sender: {
+					// To ensure the correct sender
+					_id: user?._id,
+					username: user?.username,
+				},
+				content: message,
+			},
 		]);
 		await saveConversation(conversationId, user, message);
 	};
@@ -31,14 +39,12 @@ function ChatContainer({
 			socket.current.on("msg-receive", (messageContent) => {
 				setCurrentConversation((prevMessages) => [
 					...prevMessages,
-					{ message: { content: messageContent } },
+					{
+						content: messageContent,
+					},
 				]);
 			});
 		}
-
-		return () => {
-			socket.current.off("msg-receive");
-		};
 	}, [user]);
 	return (
 		<div className="message-container">
