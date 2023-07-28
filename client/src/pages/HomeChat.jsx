@@ -17,7 +17,7 @@ function HomeChat(props) {
 	const [contacts, setContacts] = useState([]);
 	const [currentChat, setCurrentChat] = useState(undefined);
 	const [currentConversation, setCurrentConversation] = useState(undefined);
-	const [getConversationId, setConversationId] = useState(undefined);
+	const [getDocumentConversation, setDocumentConversation] = useState(null);
 
 	// get User from local storage
 	const user = useCurrentUser();
@@ -27,7 +27,19 @@ function HomeChat(props) {
 			socket.current = io(config.host); // Server host
 			socket.current.emit("connect-user", user?._id);
 		}
+
+		return () => {
+			if (socket.current) {
+				socket.current.disconnect();
+			}
+		};
 	}, [user]);
+
+	useEffect(() => {
+		if (socket.current && currentChat) {
+			socket.current.emit("join-conversation", getDocumentConversation?._id);
+		}
+	}, [getDocumentConversation]);
 
 	useEffect(() => {
 		async function fetchContacts() {
@@ -45,86 +57,94 @@ function HomeChat(props) {
 	}, [user]);
 
 	useEffect(() => {
-		async function fetchMessages() {
-			try {
-				if (user?._id && currentChat?._id) {
-					const { data: conversation } = await getConversation(
-						user._id,
-						currentChat._id
-					);
-					if (conversation) {
-						setCurrentConversation(conversation.messages);
-						setConversationId(conversation._id);
-					}
-				}
-			} catch (ex) {
-				console.error("Error fetching conversation:", ex);
-			}
+		const handleMessageReceived = (messageContent) => {
+			setCurrentConversation((prevMessages) => [
+				...prevMessages,
+				{
+					sender: { _id: currentChat?._id, username: currentChat?.username },
+					content: messageContent,
+				},
+			]);
+		};
+
+		if (socket.current) {
+			socket.current.on("receive-message", handleMessageReceived);
 		}
 
-		async function createNewConversation() {
-			try {
-				if (user?._id && currentChat?._id) {
-					const { data: conversation } = await newConversation(
-						user._id,
-						currentChat._id
-					);
-
-					if (conversation) {
-						setCurrentConversation(conversation.messages);
-						setConversationId(conversation._id);
-					}
-				}
-			} catch (ex) {
-				console.error("Error creating conversation:", ex);
+		return () => {
+			if (socket.current && getDocumentConversation) {
+				socket.current.off("receive-message", handleMessageReceived);
 			}
-		}
+		};
+	}, [user]);
 
-		createNewConversation();
-		fetchMessages();
-	}, [currentChat, user]);
-	// // console.log("response", currentConversation);
-	// // console.log("user", user);
-	// // console.log("contacts", contacts);
-	// console.log("currentchat", currentChat);
-	// console.log("conversationId", getConversationId);
+	const fetchMessages = async (contactId) => {
+		try {
+			const { data: conversation } = await getConversation(
+				user?._id,
+				contactId
+			);
+			if (conversation) {
+				setCurrentConversation(conversation.message);
+				setDocumentConversation(conversation);
+			}
+		} catch (ex) {
+			console.log("Error fetching Conversation", ex);
+		}
+	};
+
+	const createConversation = async (contactId) => {
+		try {
+			if (user?._id && contactId) {
+				const { data: conversation } = await newConversation(
+					user._id,
+					contactId
+				);
+
+				if (conversation) {
+					setCurrentConversation(conversation.messages);
+					setDocumentConversation(conversation);
+				}
+			}
+		} catch (ex) {
+			console.log("Error creating conversation", ex);
+		}
+	};
 
 	const handleMessage = async (message) => {
 		// !message parameter is just a string
-		socket.current.emit("send-msg", {
-			message: message,
-			receiver: currentChat?._id,
-		});
+		const receiver = getDocumentConversation?.participants?.find(
+			(participant) => participant === currentChat._id
+		);
 
-		setCurrentConversation((prevMessages) => [
-			...prevMessages,
-			{
-				sender: {
-					// To ensure the correct sender
-					_id: user?._id,
-					username: user?.username,
-				},
-				content: message,
-			},
-		]);
-		await saveConversation(getConversationId, user, message);
-	};
+		if (receiver) {
+			socket.current.emit(
+				"send-message",
+				getDocumentConversation?._id,
+				receiver,
+				message
+			);
 
-	useEffect(() => {
-		if (socket.current) {
-			socket.current.on("msg-receive", (messageContent) => {
-				setCurrentConversation((prevMessages) => [
-					...prevMessages,
-					{
-						content: messageContent,
+			setCurrentConversation((prevMessages) => [
+				...prevMessages,
+				{
+					sender: {
+						// To ensure the correct sender
+						_id: user?._id,
+						username: user?.username,
 					},
-				]);
-			});
+					content: message,
+				},
+			]);
 		}
-	}, [user]);
+		await saveConversation(getDocumentConversation?._id, user, message);
+	};
 
 	const handleChatChange = (chat) => {
 		setCurrentChat(chat);
+
+		fetchMessages(chat._id);
+		createConversation(chat._id);
 	};
 
 	return (
@@ -136,7 +156,6 @@ function HomeChat(props) {
 			/>
 			{currentChat ? (
 				<ChatContainer
-					conversationId={getConversationId}
 					currentChat={currentChat}
 					setCurrentConversation={setCurrentConversation}
 					messages={currentConversation}

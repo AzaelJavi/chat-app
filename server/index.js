@@ -1,16 +1,12 @@
 const express = require("express");
 const cors = require("cors");
-// const http = require("http");
 const socket = require("socket.io");
 const app = express();
-// const server = http.createServer(app);
-// const io = socketio(server);
 
 require("dotenv").config();
 require("./startup/db")();
-// require("./startup/cors")(app);
-app.use(cors());
 require("./startup/routes")(app);
+app.use(cors());
 
 const port = process.env.PORT || 9000;
 const server = app.listen(port, () =>
@@ -24,25 +20,33 @@ const io = socket(server, {
 	},
 });
 
-global.onlineUsers = new Map();
 io.on("connection", (socket) => {
-	global.chatSocket = socket;
-
 	socket.on("connect-user", (userId) => {
-		onlineUsers.set(userId, socket.id);
+		console.log(`Connected ${userId} with this socket ${socket.id}`);
 	});
 
-	socket.on("send-msg", (data) => {
-		const messageContent = data.message;
+	socket.on("join-conversation", (conversationId) => {
+		if (conversationId) {
+			socket.join(conversationId);
+			console.log(`${socket.id} Joined the conversation ${conversationId}`);
 
-		const sendUserSocket = onlineUsers.get(data.receiver);
-		// If the receiver is online, receiver will see the realtime message, otherwise the message stored in the database.
-		if (sendUserSocket) {
-			socket.to(sendUserSocket).emit("msg-receive", messageContent);
+			// Get the list of users in the conversation room
+			const room = io.sockets.adapter.rooms.get(conversationId);
+			if (room) {
+				const usersInRoom = Array.from(room.keys()); // Get the socket IDs of users in the room
+
+				// Log the users that have joined the room
+				console.log(`Users in room ${conversationId}:`, usersInRoom);
+			}
 		}
 	});
 
-	socket.on("disconnect", () => {
-		console.log(`A user disconnected with socket id: ${socket.id}`);
+	socket.on("send-message", (conversationId, currentChat, message) => {
+		if (conversationId) {
+			socket.to(conversationId).emit("receive-message", message);
+			// console.log(`Received message ${message} from ${socket.id}`);
+			// console.log(`receiver: ${currentChat} Socket ID: ${socket.id}`);
+			// console.log(`Conversation ID: ${conversationId}`);
+		}
 	});
 });

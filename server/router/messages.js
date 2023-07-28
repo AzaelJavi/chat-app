@@ -53,7 +53,6 @@ router.put("/:id", async (req, res) => {
 
 		const conversation = await Conversation.findById(req.params.id);
 
-		console.log(conversation);
 		if (!conversation) return res.status(404).send("Conversation not found.");
 
 		// Check participants
